@@ -1,3 +1,4 @@
-# PBS manuscript
-## Pregnancy after bariatric surgery
-This repository contains pre-processed data and code nessesary to reproduce the results presented in the manuscript.
+# PBS_microbiome
+### Previous malabsorptive bariatric surgery alters maternal host-microbe co-metabolism throughout pregnancy
+
+This repository contains pre-processed data and code to reproduce the results in the manuscript.
