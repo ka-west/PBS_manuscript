@@ -6,6 +6,7 @@ output:
   html_document:
     toc: true
     theme: cerulean
+    fig_caption: yes
 ---
 
 ***
@@ -16,7 +17,8 @@ output:
 
 ***
 
-```{r parameters, include=FALSE}
+Parameters
+```{r parameters}
 
 save_dir <- "output" # where to save figures and tables
 if (!dir.exists(save_dir)) { stop(paste("save_dir", save_dir, "does not exist")) }
@@ -31,13 +33,17 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.align = "center")
 
 pkgs <- c("tidyverse", "santaR", "phyloseq", "ggpubr", "ggplot2",
           "vegan", "DESeq2", "mixOmics", "Hmisc", "igraph", "ppcor", 
-          "reshape2", "doParallel", "plotly")
+          "reshape2", "plotly")
 lapply(pkgs, require, character.only = TRUE)
-
-load("PBS_data.Rdata")
 
 theme_set(theme_bw())
 
+```
+
+Load data
+```{r}
+load("PBS_data.Rdata")
+ls()
 ```
 
 ### Figure 1: Longitudinal modelling of metabolite concentrations
@@ -46,7 +52,7 @@ Metabolites were considered discriminatory (malabsorptive vs control) if their N
 
 The behavior of key discriminatory metabolites over time was assessed and compared between control and malabsorptive groups using `santaR` time-series analysis.   
    
-**Abbreviations**: PAG: phenylacetylglutamine, PCS: p-cresol sulfate, IS: indoxyl sulfate, PHPA: p-hydroxyphenylacetate, unkn: unknown, aKIV: alpha-ketoisovalerate, MM: methylmalonate, THB: D-beta-hydroxybutyrate, NAGP: N-acetyl glycoprotein  
+**Abbreviations**: PAG: phenylacetylglutamine, PCS: *p*-cresol sulfate, IS: indoxyl sulfate, PHPA: *p*-hydroxyphenylacetate, unkn: unknown, aKIV: α-ketoisovalerate, MM: methylmalonate, THB: D-β-hydroxybutyrate, NAGP: N-acetyl glycoprotein  
 
 ```{r figure1_serum_input}
 
@@ -70,8 +76,6 @@ plot_titles <- c("Serum - Leucine",
 
 # see santaR vignette for choosing this value 
 degrees_freedom <- 5
-
-plot_colors <- c("purple", "darkturquoise", "coral2")
 
 # add custom locations (y axis) on plots for p values 
 pval_locs = c(27, 20, 2.1, 5.0, 8.0, 17)
@@ -98,7 +102,9 @@ for (metab in 1:length(metab_names)) {
                    xlab = NULL, 
                    ylab = NULL, 
                    colorVect = unlist(color_pal[-2]), 
-                   title = plot_titles[metab]) + 
+                   title = plot_titles[metab]) +
+    scale_x_continuous(breaks = 1:6, 
+                       labels = c("T1", "T2", "T3", "T4", "T5", "T6")) +
     theme(plot.title = element_text(size = 6), 
           legend.position = "None", 
           axis.text = element_text(size = 5),
@@ -167,7 +173,9 @@ for (metab in 1:length(metab_names)) {
                    xlab = NULL, 
                    ylab = NULL, 
                    colorVect = unlist(color_pal[-2]), 
-                   title = plot_titles[metab]) + 
+                   title = plot_titles[metab]) +
+    scale_x_continuous(breaks = 1:6, 
+                       labels = c("T1", "T2", "T3", "T4", "T5", "T6")) +
     theme(plot.title = element_text(size = 6), 
           legend.position = "None", 
           axis.text = element_text(size = 5),
@@ -229,7 +237,7 @@ fig1 <- annotate_figure(p,
 
 ```
 
-```{r save_fig1, echo=FALSE}
+```{r save_fig1, echo=FALSE, out.width="120%"}
 
 ggsave(fig1, 
        filename = file.path(save_dir, "figure1_time_series_metab.pdf"), 
@@ -263,16 +271,19 @@ plot_med_specs(med_specs_serum, save_dir, "figureS2_median_spectra_serum.html")
 # urine
 plot_med_specs(med_specs_urine, save_dir, "figureS4_median_spectra_urine.html")
 
-```
+```  
 
-![Figure S2](output/figureS2_median_spectra_serum.png)
-![Figure S4](output/figureS4_median_spectra_urine.png)
+Figure S2 (annotated)
+![](output/figureS2_median_spectra_serum.png)  
+Figure S4 (annotated)
+![](output/figureS4_median_spectra_urine.png)
+*Key: 1 leucine; 2 isoleucine; 3 isobutyrate; 4 D-β-hydroxybutyrate ; 5 N- acetyl glycoprotein (GlycA) ; 6 glutamine ; 7 lipids (C=CCH2C=C) ; 8 unsaturated lipids (CH=CH); 9 valine; 10 α-ketoisovalerate; 11 methylmalonate; 12 creatinine; 13 p-cresol sulfate; 14 p-hydroxyphenylacetate; 15 phenylacetylglutamine; 16 unknown; 17 indoxyl sulfate*
 
-### Table S4: Maternal metabolic changes depend on type of bariatric surgery
+### Table S5: Maternal metabolic changes depend on type of bariatric surgery
 
 Relative concentration changes for each discriminatory metabolite were detailed at all time points for both malabsorptive and restrictive groups.
 
-```{r tableS4_inputs}
+```{r tableS5_inputs}
 
 ################## DEFINED VARIABLES ##################
 
@@ -304,7 +315,7 @@ con_name <- "No Bariatric Surgery"
 
 Generate table: log<sub>2</sub>(Fold Change) was calculated where Fold Change (FC) = mean(case)/mean(control). *P* values are from Mann-Whitney U test. 
 
-```{r tableS4_fxn}
+```{r tableS5_fxn}
 
 univariate_metabolites <- function(input_data, 
                                    metab_names, 
@@ -357,9 +368,9 @@ univariate_metabolites <- function(input_data,
 
 Generate table for each case group
 
-```{r tableS4}
+```{r tableS5}
 
-tableS4 <- NULL
+tableS5 <- NULL
 for (gr in case_names) {
   idx <- univariate_metabolites(input_data, 
                                 metab_names, 
@@ -368,30 +379,30 @@ for (gr in case_names) {
                                 group_col, 
                                 case_name = gr, 
                                 con_name)
-  tableS4 <- rbind(tableS4, idx)
+  tableS5 <- rbind(tableS5, idx)
 }
 
 ```
 
 Format table
 
-```{r format_tableS4}
+```{r format_tableS5}
 
 # change p values to scientific notation
-tableS4_formatted <- tableS4 %>%
-  mutate(P = formatC(tableS4$p.val, format = "e", digits = 2),
-            Padj = formatC(tableS4$p.adj.BH, format = "e", digits = 2))
+tableS5_formatted <- tableS5 %>%
+  mutate(P = formatC(tableS5$p.val, format = "e", digits = 2),
+            Padj = formatC(tableS5$p.adj.BH, format = "e", digits = 2))
 
 # change non-significant p values to NS
-tableS4_formatted$P[as.numeric(tableS4_formatted$P) > 0.05] <- "NS"
-tableS4_formatted$Padj[as.numeric(tableS4_formatted$Padj) > 0.05] <- "NS"
+tableS5_formatted$P[as.numeric(tableS5_formatted$P) > 0.05] <- "NS"
+tableS5_formatted$Padj[as.numeric(tableS5_formatted$Padj) > 0.05] <- "NS"
 
 ```
 
-```{r save_tableS4, echo=FALSE}
+```{r save_tableS5, echo=FALSE}
 
-write.csv(tableS4_formatted[,c("Metabolite","Time_point","Group","log2FC","P","Padj")], 
-          file = file.path(save_dir, "tableS4_metabolic_changes.csv"), row.names = F)
+write.csv(tableS5_formatted[,c("Metabolite","Time_point","Group","log2FC","P","Padj")], 
+          file = file.path(save_dir, "tableS5_metabolic_changes.csv"), row.names = F)
 
 ```
 
@@ -403,7 +414,7 @@ Graphical representation of the changes
 
 ################## DEFINED VARIABLES ##################
 
-input_data <- tableS4_formatted %>%
+input_data <- tableS5_formatted %>%
   # label significant data
   mutate(plot_sig = ifelse(Padj == "NS", NA, "*"),
          Group_label = case_when(Group == "Malabsorptive" ~ "MAL",
@@ -523,7 +534,7 @@ figS3 <- ggarrange(serum_dotplot, urine_dotplot,
 
 ```
 
-```{r save_figS3, echo=FALSE}
+```{r save_figS3, echo=FALSE, fig.width=8, fig.height=5}
 
 ggsave(figS3, 
        filename = file.path(save_dir, "figureS3_metabolic_changes.pdf"), 
@@ -609,7 +620,7 @@ figS6 <- ggarrange(PAG_T1_boxplot, PAG_T2_boxplot, PAG_T3_boxplot, PAG_T4_boxplo
 
 ```
 
-```{r save_figureS6, echo=FALSE}
+```{r save_figureS6, echo=FALSE, out.width="120%"}
 
 ggsave(figS6, filename = file.path(save_dir, "figureS6_metab_BS_subgroup.pdf"), height = 150, width = 170, units = "mm")
 figS6
@@ -768,7 +779,7 @@ prev_filt <- 0.1
 
 ```
 
-Generate differential abundance table
+Generate differential abundance table (Table S6)
 
 ```{r diff_abund}
 
@@ -820,9 +831,9 @@ MWU_filt <- subset(MWU, MWU$p.adj.BH < 0.05 & abs(MWU$log2FC) != Inf)
 
 ```
 
-```{r save_tableS5, echo=FALSE}
+```{r save_tableS6, echo=FALSE}
 
-write.csv(MWU_filt, file.path(save_dir, "tableS5_changes_in_taxa_abund.csv"), row.names = F)
+write.csv(MWU_filt, file.path(save_dir, "tableS6_changes_in_taxa_abund.csv"), row.names = F)
 
 ```
 
@@ -940,7 +951,7 @@ fig2 <- ggarrange(plot1, plot2,
 
 ```
 
-```{r save_fig2, echo=FALSE}
+```{r save_fig2, echo=FALSE, fig.height=6, fig.width=9}
 
 ggsave(fig2, 
        filename = file.path(save_dir, "figure2_microbiome.pdf"), 
@@ -951,11 +962,11 @@ fig2
 
 ```
 
-### Table S6: Differentially abundant taxa in malabsorptive group
+### Table S7: Differentially abundant amplicon sequence variants
 
 Differential abundance of amplicon sequence variants was assessed by DESeq2. Taxonomic assignments at species level were compared between SILVA and RDP databases.
 
-```{r tableS6_inputs}
+```{r tableS7_inputs}
 
 ################## DEFINED VARIABLES ##################
 
@@ -982,7 +993,7 @@ gen <- c("Enterococcus", "Escherichia/Shigella", "Streptococcus", "Rothia")
 
 Make table with differential abundance and species assignments
 
-```{r tableS6, message=FALSE}
+```{r tableS7, message=FALSE}
 
 # prevalence filter
 ps_trim <- input_data %>%
@@ -1019,9 +1030,9 @@ species_assign <- merge(sigtab[,c(1:6,13)], species_assign, by = "seq")
 
 ```
 
-```{r save_tableS6, echo=FALSE}
+```{r save_tableS7, echo=FALSE}
 
-write.csv(species_assign, file.path(save_dir, "tableS6_diff_abund_asv.csv"))
+write.csv(species_assign, file.path(save_dir, "tableS7_diff_abund_asv.csv"))
 
 ```
 
@@ -1166,7 +1177,7 @@ ggsave(circosPlot(m,
                   cutoff=0.5,
                   comp = 1,
                   color.cor = c("red", "blue"), 
-                  color.blocks = c("darkolivegreen", "darkgoldenrod3", "rosybrown3"),
+                  color.blocks = c("rosybrown3", "darkgoldenrod3", "darkolivegreen"),
                   showIntraLinks = FALSE, 
                   legend = TRUE,
                   line = FALSE, 
@@ -1180,9 +1191,9 @@ ggsave(circosPlot(m,
        filename = file.path(save_dir, "figure3c_integration_circos.pdf"),
        height = 4, width = 4.5)
 
-```
+```  
 
-![Figure 3](output/figure3_integration.jpg){width=110%}
+![Figure 3 (combined)](output/figure3_integration.jpg){width=100%}  
 
 ### Figure 4: Relative concentrations of metabolites correlate with maternal insulin resistance and fetal/birth weight
 
@@ -1318,11 +1329,11 @@ cytoscape <- corr_metaVmetab_sig[,c(1:3)] %>%
 net <- graph.data.frame(cytoscape, directed = FALSE)
 write_graph(net, file.path(save_dir, "cormat_cytoscape.gml"), format = "gml")
 
-```
+```  
 
-![Figure 4 (generated with Cytoscape)](output/figure4_correlation_net.jpg){width=110%}
+![Figure 4 (generated with Cytoscape)](output/figure4_correlation_net.jpg){width=100%}  
 
-### Table S7: Relative concentrations of metabolites are negatively associated with maternal insulin resistance and fetal/birth weight
+### Table S8: Relative concentrations of metabolites correlate with maternal insulin resistance and fetal/birth weight
 
 Includes partial correlations to adjust for the effect of maternal age and BMI as well as any effect of maternal insulin resistance on the baby's weight.
 
@@ -1372,13 +1383,13 @@ for (col in c("p.val","p.adj.BH","part.pval","part.pval.adj")) {
 
 ```
 
-```{r save_tableS7, echo=FALSE}
+```{r save_tableS8, echo=FALSE}
 
-write.csv(corr_metaVmetab_sig, file.path(save_dir, "tableS7_partial_corr.csv"), row.names = FALSE)
+write.csv(corr_metaVmetab_sig, file.path(save_dir, "tableS8_partial_corr.csv"), row.names = FALSE)
 
 ```
 
-### Figures S7: Key metabolites are not associated with percentage of weight lost or length of time since surgery in malabsorptive patients
+### Figure S7: Key metabolites are not associated with percentage of weight lost or length of time since surgery in malabsorptive patients
 
 ```{r fig_s7}
 
@@ -1414,7 +1425,7 @@ p <- ggarrange(PAG_perc_wl, PCS_perc_wl, IS_perc_wl,
 
 ```
 
-```{r save_figS7, echo=FALSE}
+```{r save_figS7, echo=FALSE, fig.width=9}
 
 ggsave(p, 
        filename = file.path(save_dir, "figureS7_corr_PWL_TSS.pdf"),
