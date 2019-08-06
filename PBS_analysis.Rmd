@@ -67,6 +67,8 @@ tp_col <- "Time_point"
 patient_col <- "Study.no"
 group_col <- "Group"
 
+tp_labs <- c("T1", "T2", "T3", "T4", "T5", "T6")
+
 plot_titles <- c("Serum - Leucine", 
                  "Serum - Isoleucine", 
                  "Serum - Isobutyrate", 
@@ -103,8 +105,8 @@ for (metab in 1:length(metab_names)) {
                    ylab = NULL, 
                    colorVect = unlist(color_pal[-2]), 
                    title = plot_titles[metab]) +
-    scale_x_continuous(breaks = 1:6, 
-                       labels = c("T1", "T2", "T3", "T4", "T5", "T6")) +
+    scale_x_continuous(breaks = 1:length(tp_labs), 
+                       labels = tp_labs) +
     theme(plot.title = element_text(size = 6), 
           legend.position = "None", 
           axis.text = element_text(size = 5),
@@ -136,6 +138,8 @@ metab_names <- c("PAG", "PCS", "IS", "PHPA", "unkn", "valine", "aKIV", "MM", "cr
 tp_col <- "Time_point"
 patient_col <- "Study.no"
 group_col <- "Group"
+
+tp_labs <- c("T1", "T2", "T3", "T4", "T5", "T6")
 
 plot_titles <- c("Urine - PAG", 
                  "Urine - PCS", 
@@ -174,8 +178,8 @@ for (metab in 1:length(metab_names)) {
                    ylab = NULL, 
                    colorVect = unlist(color_pal[-2]), 
                    title = plot_titles[metab]) +
-    scale_x_continuous(breaks = 1:6, 
-                       labels = c("T1", "T2", "T3", "T4", "T5", "T6")) +
+    scale_x_continuous(breaks = 1:length(tp_labs), 
+                       labels = tp_labs) +
     theme(plot.title = element_text(size = 6), 
           legend.position = "None", 
           axis.text = element_text(size = 5),
@@ -248,9 +252,9 @@ fig1
 
 ```
 
-### Figures S2 and S4: Overlayed median 1H NMR spectra
+### Figures S1 and S4: Overlayed median 1H NMR spectra
 
-Serum (Figure S2) and urine (Figure S4) median spectra were overlayed for the three study groups
+Serum (Figure S1) and urine (Figure S4) median spectra were overlayed for the three study groups
 
 ```{r med_spec}
 
@@ -266,15 +270,15 @@ plot_med_specs <- function(to_plot, save_dir, save_name) {
 }
 
 # serum
-plot_med_specs(med_specs_serum, save_dir, "figureS2_median_spectra_serum.html")
+plot_med_specs(med_specs_serum, save_dir, "figureS1_median_spectra_serum.html")
 
 # urine
 plot_med_specs(med_specs_urine, save_dir, "figureS4_median_spectra_urine.html")
 
 ```  
 
-Figure S2 (annotated)
-![](output/figureS2_median_spectra_serum.png)  
+Figure S1 (annotated)
+![](output/figureS1_median_spectra_serum.png)  
 Figure S4 (annotated)
 ![](output/figureS4_median_spectra_urine.png)
 *Key: 1 leucine; 2 isoleucine; 3 isobutyrate; 4 D-β-hydroxybutyrate ; 5 N- acetyl glycoprotein (GlycA) ; 6 glutamine ; 7 lipids (C=CCH2C=C) ; 8 unsaturated lipids (CH=CH); 9 valine; 10 α-ketoisovalerate; 11 methylmalonate; 12 creatinine; 13 p-cresol sulfate; 14 p-hydroxyphenylacetate; 15 phenylacetylglutamine; 16 unknown; 17 indoxyl sulfate*
@@ -406,11 +410,11 @@ write.csv(tableS5_formatted[,c("Metabolite","Time_point","Group","log2FC","P","P
 
 ```
 
-### Figure S3: Maternal metabolic changes depend on type of bariatric surgery
+### Figure S2: Maternal metabolic changes depend on type of bariatric surgery
 
 Graphical representation of the changes
 
-```{r figS3_inputs}
+```{r figS2_inputs}
 
 ################## DEFINED VARIABLES ##################
 
@@ -526,22 +530,22 @@ for (s_type in names(figure_labels)) {
 
 Combine serum and urine plots
 
-```{r figS3}
+```{r figS2}
 
-figS3 <- ggarrange(serum_dotplot, urine_dotplot, 
+figS2 <- ggarrange(serum_dotplot, urine_dotplot, 
                   ncol = 2,
                   widths = c(1, 1.5))
 
 ```
 
-```{r save_figS3, echo=FALSE, fig.width=8, fig.height=5}
+```{r save_figS2, echo=FALSE, fig.width=8, fig.height=5}
 
-ggsave(figS3, 
-       filename = file.path(save_dir, "figureS3_metabolic_changes.pdf"), 
+ggsave(figS2, 
+       filename = file.path(save_dir, "figureS2_metabolic_changes.pdf"), 
        width = 180, 
        height = 100, 
        units = "mm")
-figS3
+figS2
 
 ```
 
