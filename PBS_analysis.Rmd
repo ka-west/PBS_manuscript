@@ -1018,7 +1018,7 @@ sigtab <- cbind(as(sigtab, "data.frame"), as(tax_table(ps_trim)[rownames(sigtab)
 
 # keep only genera of interest
 sigtab <- subset(sigtab, sigtab$Genus %in% gen)
-keep <- which(row.names(taxtab_rdp) %in% row.names(sigtab))
+keep <- which(row.names(rdp.species) %in% row.names(sigtab))
 
 rdp.species <- data.frame(rdp.species)
 rdp.species$seq <- row.names(rdp.species)
