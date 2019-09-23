@@ -62,6 +62,7 @@ ord <- table(integrals$Study.no) %>%
 
 # which samples were collected for each individual at each time point
 all_samples <- integrals %>%
+  filter(Time_point != 7) %>%
   mutate(urine = ifelse(!is.na(PAG), TRUE, NA),
          serum = ifelse(!is.na(isoleucine), TRUE, NA)) %>%
   full_join(mb, by = "Patient.TP") %>%
@@ -70,10 +71,9 @@ all_samples <- integrals %>%
                               urine == TRUE & is.na(serum) & faeces == TRUE ~ "Urine/Faeces",
                               is.na(urine) & serum == TRUE & faeces == TRUE ~ "Serum/Faeces",
                               urine == TRUE & is.na(serum) & is.na(faeces) ~ "Urine only",
-                              is.na(urine) & serum == TRUE & is.na(faeces) ~ "Serum only",
-                              !is.na(PAG_B) ~ "Neonatal urine"),
+                              is.na(urine) & serum == TRUE & is.na(faeces) ~ "Serum only"),
          Sampling = factor(Sampling, levels = c("Serum/Urine/Faeces", "Serum/Urine", "Urine/Faeces", 
-                                                "Serum/Faeces", "Urine only",  "Serum only", "Neonatal urine")),
+                                                "Serum/Faeces", "Urine only",  "Serum only")),
          Study.no = factor(Study.no, levels = ord))
 
 ```
@@ -89,7 +89,7 @@ p <- ggscatter(all_samples,
                ylab = "Time point",
                color = "Sampling", 
                palette = c("chartreuse3", "mediumorchid3", "dodgerblue", 
-                           "magenta", "gold2", "red3", "darkorange"),
+                           "darkorange", "gold2", "red3"),
                size = "Obesity") +
   theme(axis.text.x = element_blank(), 
         axis.ticks.x = element_blank(),
@@ -123,7 +123,7 @@ The behavior of key discriminatory metabolites over time was assessed and compar
 ################## DEFINED VARIABLES ##################
 
 # remove restrictive group
-input_data <- subset(integrals, integrals$Group != "Restrictive")
+input_data <- subset(integrals, integrals$Group != "Restrictive" & integrals$Time_point != 7)
 
 # column names
 metab_names <- c("leucine", "isoleucine", "isobutyrate", "NAGP", "glutamine", "THB")
@@ -195,7 +195,7 @@ Urine metabolites
 ################## DEFINED VARIABLES ##################
 
 # remove restrictive group
-input_data <- subset(integrals, integrals$Group != "Restrictive")
+input_data <- subset(integrals, integrals$Group != "Restrictive" & integrals$Time_point != 7)
 
 # column names
 metab_names <- c("PAG", "PCS", "IS", "PHPA", "unkn", "valine", "aKIV", "MM", "creatinine")
@@ -474,11 +474,11 @@ write.csv(tableS5_formatted[,c("Metabolite","Time_point","Group","log2FC","P","P
 
 ```
 
-### Figure S4: Maternal metabolic changes depend on type of bariatric surgery
+### Figure S3: Maternal metabolic changes depend on type of bariatric surgery
 
 Graphical representation of the changes
 
-```{r figS4_inputs}
+```{r figS3_inputs}
 
 ################## DEFINED VARIABLES ##################
 
@@ -594,22 +594,22 @@ for (s_type in names(figure_labels)) {
 
 Combine serum and urine plots
 
-```{r figS4}
+```{r figS3}
 
-figS4 <- ggarrange(serum_dotplot, urine_dotplot, 
+figS3 <- ggarrange(serum_dotplot, urine_dotplot, 
                   ncol = 2,
                   widths = c(1, 1.5))
 
 ```
 
-```{r save_figS4, echo=FALSE, out.width="110%"}
+```{r save_figS3, echo=FALSE, out.width="110%"}
 
-ggsave(figS4, 
-       filename = file.path(save_dir, "figureS4_metabolic_changes.pdf"), 
+ggsave(figS3, 
+       filename = file.path(save_dir, "figureS3_metabolic_changes.pdf"), 
        width = 180, 
        height = 100, 
        units = "mm")
-figS4
+figS3
 
 ```
 
