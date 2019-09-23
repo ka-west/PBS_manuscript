@@ -46,6 +46,70 @@ load("PBS_data.Rdata")
 ls()
 ```
 
+### Figure S1: Summary of sampling by individual
+
+Contribution of samples by study group at each time point
+
+```{r figureS1}
+
+mb <- data.frame(Patient.TP = sample_names(ps_M),
+                 faeces = TRUE)
+
+# order individuals by number of time points where samples were collected
+ord <- table(integrals$Study.no) %>% 
+  sort(decreasing = TRUE) %>% 
+  names()
+
+# which samples were collected for each individual at each time point
+all_samples <- integrals %>%
+  filter(Time_point != 7) %>%
+  mutate(urine = ifelse(!is.na(PAG), TRUE, NA),
+         serum = ifelse(!is.na(isoleucine), TRUE, NA)) %>%
+  full_join(mb, by = "Patient.TP") %>%
+  mutate(Sampling = case_when(urine == TRUE & serum == TRUE & faeces == TRUE ~ "Serum/Urine/Faeces",
+                              urine == TRUE & serum == TRUE & is.na(faeces) ~ "Serum/Urine",
+                              urine == TRUE & is.na(serum) & faeces == TRUE ~ "Urine/Faeces",
+                              is.na(urine) & serum == TRUE & faeces == TRUE ~ "Serum/Faeces",
+                              urine == TRUE & is.na(serum) & is.na(faeces) ~ "Urine only",
+                              is.na(urine) & serum == TRUE & is.na(faeces) ~ "Serum only"),
+         Sampling = factor(Sampling, levels = c("Serum/Urine/Faeces", "Serum/Urine", "Urine/Faeces", 
+                                                "Serum/Faeces", "Urine only",  "Serum only")),
+         Study.no = factor(Study.no, levels = ord))
+
+```
+
+Make plot
+
+```{r plot_figureS1}
+
+p <- ggscatter(all_samples, 
+               x = "Study.no",
+               xlab = "Individual",
+               y = "Time_point_label",
+               ylab = "Time point",
+               color = "Sampling", 
+               palette = c("chartreuse3", "mediumorchid3", "dodgerblue", 
+                           "darkorange", "gold2", "red3"),
+               size = "Obesity") +
+  theme(axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(),
+        legend.spacing.x = unit(2, "mm"),
+        legend.title = element_blank()) +
+  grids(linetype = "dashed", axis = "x", color = "grey")
+
+p <- facet(p, facet.by = "Group", scales = "free", ncol = 1)
+
+```
+
+```{r save_figureS1, echo=FALSE, fig.width=12, fig.height=7}
+
+ggsave(p, 
+       filename = file.path(save_dir, "figureS1_sampling_summary.pdf"),
+       width = 14, height = 8)
+p
+
+```
+
 ### Figure 1: Longitudinal modelling of metabolite concentrations
 
 Metabolites were considered discriminatory (malabsorptive vs control) if their NMR peaks were correlated (>=0.45) with the predictive component of a valid OPLS-DA model at any time point. A representative peak for each metabolite was integrated to calculate relative concentration.    
@@ -59,7 +123,7 @@ The behavior of key discriminatory metabolites over time was assessed and compar
 ################## DEFINED VARIABLES ##################
 
 # remove restrictive group
-input_data <- subset(integrals, integrals$Group != "Restrictive")
+input_data <- subset(integrals, integrals$Group != "Restrictive" & integrals$Time_point != 7)
 
 # column names
 metab_names <- c("leucine", "isoleucine", "isobutyrate", "NAGP", "glutamine", "THB")
@@ -131,7 +195,7 @@ Urine metabolites
 ################## DEFINED VARIABLES ##################
 
 # remove restrictive group
-input_data <- subset(integrals, integrals$Group != "Restrictive")
+input_data <- subset(integrals, integrals$Group != "Restrictive" & integrals$Time_point != 7)
 
 # column names
 metab_names <- c("PAG", "PCS", "IS", "PHPA", "unkn", "valine", "aKIV", "MM", "creatinine")
@@ -252,9 +316,9 @@ fig1
 
 ```
 
-### Figures S1 and S4: Overlayed median 1H NMR spectra
+### Figures S2 and S5: Overlayed median 1H NMR spectra
 
-Serum (Figure S1) and urine (Figure S4) median spectra were overlayed for the three study groups
+Serum (Figure S2) and urine (Figure S5) median spectra were overlayed for the three study groups
 
 ```{r med_spec}
 
@@ -270,17 +334,17 @@ plot_med_specs <- function(to_plot, save_dir, save_name) {
 }
 
 # serum
-plot_med_specs(med_specs_serum, save_dir, "figureS1_median_spectra_serum.html")
+plot_med_specs(med_specs_serum, save_dir, "figureS2_median_spectra_serum.html")
 
 # urine
-plot_med_specs(med_specs_urine, save_dir, "figureS4_median_spectra_urine.html")
+plot_med_specs(med_specs_urine, save_dir, "figureS5_median_spectra_urine.html")
 
 ```  
 
-Figure S1 (annotated)
-![](output/figureS1_median_spectra_serum.png)  
-Figure S4 (annotated)
-![](output/figureS4_median_spectra_urine.png)
+Figure S2 (annotated)
+![](output/figureS2_median_spectra_serum.png)  
+Figure S5 (annotated)
+![](output/figureS5_median_spectra_urine.png)
 *Key: 1 leucine; 2 isoleucine; 3 isobutyrate; 4 D-β-hydroxybutyrate ; 5 N- acetyl glycoprotein (GlycA) ; 6 glutamine ; 7 lipids (C=CCH2C=C) ; 8 unsaturated lipids (CH=CH); 9 valine; 10 α-ketoisovalerate; 11 methylmalonate; 12 creatinine; 13 p-cresol sulfate; 14 p-hydroxyphenylacetate; 15 phenylacetylglutamine; 16 unknown; 17 indoxyl sulfate*
 
 ### Table S5: Maternal metabolic changes depend on type of bariatric surgery
@@ -410,11 +474,11 @@ write.csv(tableS5_formatted[,c("Metabolite","Time_point","Group","log2FC","P","P
 
 ```
 
-### Figure S2: Maternal metabolic changes depend on type of bariatric surgery
+### Figure S3: Maternal metabolic changes depend on type of bariatric surgery
 
 Graphical representation of the changes
 
-```{r figS2_inputs}
+```{r figS3_inputs}
 
 ################## DEFINED VARIABLES ##################
 
@@ -530,30 +594,30 @@ for (s_type in names(figure_labels)) {
 
 Combine serum and urine plots
 
-```{r figS2}
+```{r figS3}
 
-figS2 <- ggarrange(serum_dotplot, urine_dotplot, 
+figS3 <- ggarrange(serum_dotplot, urine_dotplot, 
                   ncol = 2,
                   widths = c(1, 1.5))
 
 ```
 
-```{r save_figS2, echo=FALSE, fig.width=8, fig.height=5}
+```{r save_figS3, echo=FALSE, out.width="110%"}
 
-ggsave(figS2, 
-       filename = file.path(save_dir, "figureS2_metabolic_changes.pdf"), 
+ggsave(figS3, 
+       filename = file.path(save_dir, "figureS3_metabolic_changes.pdf"), 
        width = 180, 
        height = 100, 
        units = "mm")
-figS2
+figS3
 
 ```
 
-### Figure S6: Relative concentrations of urinary host-microbial co-metabolites vary depending on bariatric surgery sub-type
+### Figure S7: Relative concentrations of urinary host-microbial co-metabolites vary depending on bariatric surgery sub-type
 
 Comparison of key discriminatory metabolites between study sub-groups.
 
-```{r figureS6_input}
+```{r figureS7_input}
 
 ################## DEFINED VARIABLES ##################
 
@@ -611,9 +675,9 @@ for (metab in metab_names) {
 
 Combine all plots together
 
-```{r figureS6}
+```{r figureS7}
 
-figS6 <- ggarrange(PAG_T1_boxplot, PAG_T2_boxplot, PAG_T3_boxplot, PAG_T4_boxplot, 
+figS7 <- ggarrange(PAG_T1_boxplot, PAG_T2_boxplot, PAG_T3_boxplot, PAG_T4_boxplot, 
                    PAG_T5_boxplot, PAG_T6_boxplot, PCS_T1_boxplot, PCS_T2_boxplot, 
                    PCS_T3_boxplot, PCS_T4_boxplot, PCS_T5_boxplot, PCS_T6_boxplot,
                    IS_T1_boxplot, IS_T2_boxplot, IS_T3_boxplot, IS_T4_boxplot, 
@@ -624,10 +688,10 @@ figS6 <- ggarrange(PAG_T1_boxplot, PAG_T2_boxplot, PAG_T3_boxplot, PAG_T4_boxplo
 
 ```
 
-```{r save_figureS6, echo=FALSE, out.width="120%"}
+```{r save_figureS7, echo=FALSE, out.width="120%"}
 
-ggsave(figS6, filename = file.path(save_dir, "figureS6_metab_BS_subgroup.pdf"), height = 150, width = 170, units = "mm")
-figS6
+ggsave(figS7, filename = file.path(save_dir, "figureS7_metab_BS_subgroup.pdf"), height = 150, width = 170, units = "mm")
+figS7
 
 ```
 
@@ -1393,9 +1457,9 @@ write.csv(corr_metaVmetab_sig, file.path(save_dir, "tableS8_partial_corr.csv"), 
 
 ```
 
-### Figure S7: Key metabolites are not associated with percentage of weight lost or length of time since surgery in malabsorptive patients
+### Figure S8: Key metabolites are not associated with percentage of weight lost or length of time since surgery in malabsorptive patients
 
-```{r fig_s7}
+```{r fig_S8}
 
 to_cor <- integrals %>%
   filter(Group_label == "MAL",
@@ -1429,10 +1493,10 @@ p <- ggarrange(PAG_perc_wl, PCS_perc_wl, IS_perc_wl,
 
 ```
 
-```{r save_figS7, echo=FALSE, fig.width=9}
+```{r save_figS8, echo=FALSE, fig.width=9}
 
 ggsave(p, 
-       filename = file.path(save_dir, "figureS7_corr_PWL_TSS.pdf"),
+       filename = file.path(save_dir, "figureS8_corr_PWL_TSS.pdf"),
        height = 5.5, width = 9)
 p
 
