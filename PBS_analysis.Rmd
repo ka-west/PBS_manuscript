@@ -110,6 +110,37 @@ p
 
 ```
 
+### Figures S2 and S5: Overlayed median 1H NMR spectra
+
+Serum (Figure S2) and urine (Figure S5) median spectra were overlayed for the three study groups
+
+```{r med_spec}
+
+plot_med_specs <- function(to_plot, save_dir, save_name) {
+  
+  p <- plot_ly(to_plot, x = ~ppm, y = ~MAL, name = "MAL", type = "scatter", mode = "lines", alpha = 0.8, color = color_pal$MAL) %>%
+    add_trace(y = ~RES, name = "RES", mode = "lines", alpha = 0.8, color = color_pal$RES) %>%
+    add_trace(y = ~NBS, name = "NBS", mode = "lines", alpha = 0.8, color = color_pal$NBS) %>%
+    layout(xaxis = list(autorange = "reversed", size = 18),
+           yaxis = list(title = "Integral (a.u.)", size = 18))
+  
+  htmlwidgets::saveWidget(p, file = file.path(getwd(), save_dir, save_name))
+}
+
+# serum
+plot_med_specs(med_specs_serum, save_dir, "figureS2_median_spectra_serum.html")
+
+# urine
+plot_med_specs(med_specs_urine, save_dir, "figureS5_median_spectra_urine.html")
+
+```  
+
+Figure S2 (annotated)
+![](output/figureS2_median_spectra_serum.png)  
+Figure S5 (annotated)
+![](output/figureS5_median_spectra_urine.png)
+*Key: 1 leucine; 2 isoleucine; 3 isobutyrate; 4 D-β-hydroxybutyrate ; 5 N- acetyl glycoprotein (GlycA) ; 6 glutamine ; 7 lipids (C=CCH2C=C) ; 8 unsaturated lipids (CH=CH); 9 valine; 10 α-ketoisovalerate; 11 methylmalonate; 12 creatinine; 13 p-cresol sulfate; 14 p-hydroxyphenylacetate; 15 phenylacetylglutamine; 16 unknown; 17 indoxyl sulfate*
+
 ### Figure 1: Longitudinal modelling of metabolite concentrations
 
 Metabolites were considered discriminatory (malabsorptive vs control) if their NMR peaks were correlated (>=0.45) with the predictive component of a valid OPLS-DA model at any time point. A representative peak for each metabolite was integrated to calculate relative concentration.    
@@ -315,37 +346,6 @@ ggsave(fig1,
 fig1
 
 ```
-
-### Figures S2 and S5: Overlayed median 1H NMR spectra
-
-Serum (Figure S2) and urine (Figure S5) median spectra were overlayed for the three study groups
-
-```{r med_spec}
-
-plot_med_specs <- function(to_plot, save_dir, save_name) {
-  
-  p <- plot_ly(to_plot, x = ~ppm, y = ~MAL, name = "MAL", type = "scatter", mode = "lines", alpha = 0.8, color = color_pal$MAL) %>%
-    add_trace(y = ~RES, name = "RES", mode = "lines", alpha = 0.8, color = color_pal$RES) %>%
-    add_trace(y = ~NBS, name = "NBS", mode = "lines", alpha = 0.8, color = color_pal$NBS) %>%
-    layout(xaxis = list(autorange = "reversed", size = 18),
-           yaxis = list(title = "Integral (a.u.)", size = 18))
-  
-  htmlwidgets::saveWidget(p, file = file.path(getwd(), save_dir, save_name))
-}
-
-# serum
-plot_med_specs(med_specs_serum, save_dir, "figureS2_median_spectra_serum.html")
-
-# urine
-plot_med_specs(med_specs_urine, save_dir, "figureS5_median_spectra_urine.html")
-
-```  
-
-Figure S2 (annotated)
-![](output/figureS2_median_spectra_serum.png)  
-Figure S5 (annotated)
-![](output/figureS5_median_spectra_urine.png)
-*Key: 1 leucine; 2 isoleucine; 3 isobutyrate; 4 D-β-hydroxybutyrate ; 5 N- acetyl glycoprotein (GlycA) ; 6 glutamine ; 7 lipids (C=CCH2C=C) ; 8 unsaturated lipids (CH=CH); 9 valine; 10 α-ketoisovalerate; 11 methylmalonate; 12 creatinine; 13 p-cresol sulfate; 14 p-hydroxyphenylacetate; 15 phenylacetylglutamine; 16 unknown; 17 indoxyl sulfate*
 
 ### Table S5: Maternal metabolic changes depend on type of bariatric surgery
 
