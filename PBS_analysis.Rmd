@@ -118,7 +118,8 @@ Serum (Figure S2) and urine (Figure S5) median spectra were overlayed for the th
 
 plot_med_specs <- function(to_plot, save_dir, save_name) {
   
-  p <- plot_ly(to_plot, x = ~ppm, y = ~MAL, name = "MAL", type = "scatter", mode = "lines", alpha = 0.8, color = color_pal$MAL) %>%
+  p <- plot_ly(to_plot, x = ~ppm, y = ~MAL, name = "MAL", type = "scatter", 
+               mode = "lines", alpha = 0.8, color = color_pal$MAL) %>%
     add_trace(y = ~RES, name = "RES", mode = "lines", alpha = 0.8, color = color_pal$RES) %>%
     add_trace(y = ~NBS, name = "NBS", mode = "lines", alpha = 0.8, color = color_pal$NBS) %>%
     layout(xaxis = list(autorange = "reversed", size = 18),
